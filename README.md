@@ -1,3 +1,6 @@
+# Note
+### This project was developed on API that run on localhost, change the target url in tekkom.js file.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
