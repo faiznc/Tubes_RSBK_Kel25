@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import '../App.css';
-import { Card, Avatar } from 'antd';
-import { AntDesignOutlined } from '@ant-design/icons';
-
+import { Card } from 'antd';
 
 export default class Cards extends Component {
     render() {
@@ -12,10 +10,9 @@ export default class Cards extends Component {
         const alamat = this.props.alamat
         return (
             <Card style={{ background: "#92817a", borderRadius: '25px', minWidth: '20vw' }}>
-                Halo {nama}
-                <p>Halo2 {nama}</p>
-                {nama}
-
+                <h3>{nama}</h3>
+                <h4>{nomor}</h4>
+                <h4>{alamat}</h4>
             </Card>
         )
     }

@@ -5,10 +5,8 @@ import App from './App';
 import Tekkom from './tekkom';
 import reportWebVitals from './reportWebVitals';
 
-
 ReactDOM.render(
   <React.StrictMode>
-    {/* <App /> */}
     <Tekkom />
   </React.StrictMode>,
   document.getElementById('root')

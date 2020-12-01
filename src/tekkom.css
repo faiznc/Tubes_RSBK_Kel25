@@ -27,6 +27,15 @@
   font-size: large;
 }
 
+.my-footer{
+  background-color: #ffa62b;
+  color: #000000;
+  padding: 1%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: small;
+}
 
 
 .App {

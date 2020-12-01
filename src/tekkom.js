@@ -1,22 +1,16 @@
 import React, { Component } from "react";
 import axios from "axios";
 import { Modal, Card } from "antd";
-import { Typography, Row, Col, Space, Layout } from 'antd';
+import { Row, Col, Space, Layout } from 'antd';
 import "antd/dist/antd.css";
 import './tekkom.css';
 import Button1 from './components/button';
 import Input from './components/input';
-
 import Cards from './components/cards';
-
-
 const { Header, Footer, Content } = Layout;
-
 
 // const url = "http://36.80.179.203/api/index.php/kontak";
 const url = "http://localhost/api/index.php/kontak";
-
-var pilih = true;
 
 export default class tekkom extends Component {
     constructor(props) {
@@ -24,6 +18,9 @@ export default class tekkom extends Component {
         this.state = {
             tekkom: [],
             visible: false,
+            visible2: false,
+            visible_advanced: false,
+            id_update: "",
             nama: "",
             alamat: "",
             nomor: "",
@@ -31,12 +28,30 @@ export default class tekkom extends Component {
         };
     }
 
-    handleButton = (nama, alamat, nomor) => {
-        alert("Bapak/Ibu " + nama + " bertempat tinggal di " + alamat + " (" + nomor + ") ");
+    handleButton = (nama, alamat, nomor, id) => {
+        alert("ID:" + id + " - Bapak/Ibu " + nama + " bertempat tinggal di " + alamat + " (" + nomor + ")");
     };
     handleTambahOrang = () => {
         this.setState({
             visible: true,
+        });
+    };
+
+    handleUpdateButton = (id_update, nama, nomor, alamat) => {
+        this.setState({
+            visible2: true,
+            id_update: id_update,
+            nama: nama,
+            nomor: nomor,
+            alamat: alamat,
+        });
+        console.log(this.state.nama);
+    };
+
+    handleAdvanced = () => {
+        var a_var = this.state.visible_advanced;
+        this.setState({
+            visible_advanced: !a_var,
         });
     };
 
@@ -97,34 +112,45 @@ export default class tekkom extends Component {
         }
     };
 
-    handleUpdate = (id, nama, nomor, alamat) => {
+    handleUpdate = () => {
+        // console.log(id);
+        console.log("KIRIM");
 
         var value = {
-            id: id,
-            nama: 'Ganti',
-            nomor: nomor,
-            alamat: alamat,
+            id: this.state.id_update,
+            nama: this.state.nama,
+            nomor: this.state.nomor,
+            alamat: this.state.alamat,
         }
 
-        axios({
-            method: "put",
-            url: url,
-            headers: {
-                accept: "*/*",
-            },
-            data: value,
-        })
-
-            .then(function (response) {
-                if (response.status === 200) {
-                    console.log("Update Success");
-                    alert("Berhasil Update");
-                }
+        if (
+            this.state.nama !== "" &&
+            this.state.nomor !== "" &&
+            this.state.alamat !== ""
+        ) {
+            axios({
+                method: "put",
+                url: url,
+                headers: {
+                    accept: "*/*",
+                },
+                data: value,
             })
-            .catch(function (response) {
-                console.log(response);
-                alert("Terjadi Masalah");
-            });
+
+                .then(function (response) {
+                    if (response.status === 200) {
+                        console.log("Update Success");
+                        alert("Berhasil Update");
+                        window.location.reload();
+                    }
+                })
+                .catch(function (response) {
+                    alert("Terjadi Masalah");
+                });
+        }
+        else {
+            alert("pastikan semua kolom terisi");
+        }
     }
 
     componentDidMount() {
@@ -133,12 +159,6 @@ export default class tekkom extends Component {
             url: url,
 
             headers: { 'content-type': 'application/x-www-form-urlencoded' },
-
-            proxy: {
-                host: '172.67.182.58',
-                port: 80
-            }
-
         })
             .then((data) => {
                 // console.log(data.data);
@@ -152,104 +172,136 @@ export default class tekkom extends Component {
     }
 
     render() {
+        return (
+            <Layout className="layout">
 
-        if (pilih === true) {
+                <Header className="my-header">
+                    <Row>
+                        <Col span={8} className="header-columns">
+                            <Button1 onClick={this.handleTambahOrang}>Tambah Kontak</Button1>
+                        </Col>
+                        <Col span={8} className="header-columns">
+                            <h2 onClick={this.handleAdvanced} >List data kontak</h2>
+                        </Col>
+                        <Col span={8} className="header-columns">
+                            <Input type="text" placeholder="Cari..." onKeyUp={this.handleCari} />
+                        </Col>
+                    </Row>
+                </Header>
 
-            return (
-                <Layout className="layout">
-
-                    <Header className="my-header">
-                        <Row>
-                            <Col span={8} className="header-columns">
-                                <Button1 onClick={this.handleTambahOrang}>Tambah Kontak</Button1>
-                            </Col>
-                            <Col span={8} className="header-columns">
-                                <h2>List data kontak</h2>
-                            </Col>
-                            <Col span={8} className="header-columns">
-                                <Input type="text" placeholder="Cari..." onKeyUp={this.handleCari} />
-                            </Col>
-                        </Row>
-                    </Header>
-
-                    {<Modal
-                        title="Tambah Data"
-                        centered='true'
-                        visible={this.state.visible}
-                        onOk={this.handleSubmit}
-                        onCancel={() => this.setState({ visible: false })}
-                        width={500}
-                    >
-                        <div style={{ textAlign: "center" }}>
-                            <p>Nama Anggota : </p>{" "}
-                            <input
-                                type="text"
-                                placeholder="Nama"
-                                onChange={this.handleNama}
-                            />
-                            <br />
-                            <br></br>
-                            <p>Nomor Telepon : </p>{" "}
-                            <input type="text" placeholder="Nomor Telp." onChange={this.handleNomor} />
-                            <br />
-                            <br></br>
-                            <p>Alamat : </p>{" "}
-                            <input
-                                type="text"
-                                placeholder="Alamat"
-                                onChange={this.handleAlamat}
-                            />
-                            <br />
-                        </div>
-                    </Modal>}
-
-
-                    <Content style={{background:"#16697a"}}>
+                {<Modal
+                    title="Tambah Kontak"
+                    centered='true'
+                    visible={this.state.visible}
+                    onOk={this.handleSubmit}
+                    onCancel={() => this.setState({ visible: false })}
+                    width={500}
+                >
+                    <div style={{ textAlign: "center" }}>
+                        <p>Nama Anggota : </p>
+                        <input
+                            type="text"
+                            placeholder="Nama"
+                            onChange={this.handleNama}
+                        />
+                        <br />
                         <br></br>
-                        <center>
+                        <p>Nomor Telepon : </p>
+                        <input
+                            type="text"
+                            placeholder="Nomor Telp."
+                            onChange={this.handleNomor} />
+                        <br />
+                        <br></br>
+                        <p>Alamat : </p>
+                        <input
+                            type="text"
+                            placeholder="Alamat"
+                            onChange={this.handleAlamat}
+                        />
+                        <br />
+                    </div>
+                </Modal>}
+
+                {<Modal
+                    title="Ubah Kontak"
+                    centered='true'
+                    visible={this.state.visible2}
+                    onOk={this.handleUpdate}
+                    onCancel={() => this.setState({ visible2: false })}
+                    width={500}
+                >
+                    <div style={{ textAlign: "center" }}>
+                        <p>Nama Anggota : </p>
+                        <input
+                            type="text"
+                            placeholder="Nama"
+                            onChange={this.handleNama}
+                            value={this.state.nama}
+                        />
+                        <br />
+                        <br></br>
+                        <p>Nomor Telepon : </p>
+                        <input
+                            type="text"
+                            placeholder="Nomor Telp."
+                            onChange={this.handleNomor}
+                            value={this.state.nomor} />
+                        <br />
+                        <br></br>
+                        <p>Alamat : </p>
+                        <input
+                            type="text"
+                            placeholder="Alamat"
+                            onChange={this.handleAlamat}
+                            value={this.state.alamat}
+                        />
+                        <br />
+                    </div>
+                </Modal>}
+
+                <Content style={{ background: "#16697a" }}>
+                    <br></br>
+
+                    <center>
                         <Space direction="vertical" align='center' size='large'>
 
                             {this.state.tekkom.map((results, index) => {
-                                console.log(index);
-                                // console.log(results);
 
-                                // console.log(results.nama);
                                 var rendered =
                                     // --------------- INI yang bakal di render --------------------
                                     (
-                                        // <Space direction="horizontal">  // Niatnya mau buat 2 kontak per baris vertikal, tapi ...
+                                        <Space direction="horizontal">
                                             <div className="card" key={results.id}>
 
                                                 <Card style={{ background: "#f8f1f1", minWidth: '20vw' }}>
-                                                    <div className="card-body">
-                                                        <h5 >Nama : {results.nama}</h5>
-                                                        <h6 >
-                                                            Nomor Telepon : {results.nomor}
-                                                        </h6>
-                                                    </div>
-                                                    <button className="button" onClick={() => this.handleButton(results.nama, results.alamat, results.nomor)}>Detail</button>
-                                                    <button className="button" onClick={() => this.handleUpdate(results.id, results.nama, results.alamat, results.nomor)}>Update Kontak {results.nama}</button>
+                                                    <Cards nama={results.nama} nomor={results.nomor} alamat={results.alamat} ></Cards>
+                                                    <br></br>
+                                                    <Button1 className="button" onClick={() => this.handleButton(results.nama, results.alamat, results.nomor, results.id)}>Detail</Button1>
+                                                    <br></br>
+                                                    <br style={{ display: this.state.visible_advanced === true ? "flex" : "none" }}></br>
+                                                    <Button1 style={{ display: this.state.visible_advanced === true ? "flex" : "none" }} className="button" onClick={() => this.handleUpdateButton(results.id, results.nama, results.nomor, results.alamat)}>Update Kontak {results.nama}</Button1>
                                                 </Card>
 
                                             </div>
-                                        // {/* </Space> */}
+                                        </Space>
                                     )
 
-                                if (results.nama.toLowerCase().includes(this.state.cari.toLowerCase())) {  // Akan mengeksekusi jika objek sesuai dgn yg dicari
-                                    // console.log("Good");
+                                if (results.nama.toLowerCase().includes(this.state.cari.toLowerCase())) {
                                     return (rendered);
                                     // return (index);
                                 }
-
                                 return (''); // Psst HAPUS AJA hehehe
-
                             })}
-
                         </Space>
-                        </center>
-                    </Content>
-                </Layout>
-            );
-        }
+                    </center>
+                </Content>
+
+                <Footer className='my-footer'>
+                    <h2>Made by Kel 25</h2>
+                </Footer>
+
+            </Layout>
+        );
     }
-} 
+}
