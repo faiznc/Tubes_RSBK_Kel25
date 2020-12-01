@@ -1,7 +1,17 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Modal } from "antd";
+import { Modal, Card } from "antd";
+import { Typography, Row, Col, Space, Layout } from 'antd';
 import "antd/dist/antd.css";
+import './tekkom.css';
+import Button1 from './components/button';
+import Input from './components/input';
+
+import Cards from './components/cards';
+
+
+const { Header, Footer, Content } = Layout;
+
 
 // const url = "http://36.80.179.203/api/index.php/kontak";
 const url = "http://localhost/api/index.php/kontak";
@@ -146,82 +156,99 @@ export default class tekkom extends Component {
         if (pilih === true) {
 
             return (
-                <div>
-                    <div className="boxWhite">
-                        <center>
-                            <h1>List data kontak</h1>
-                        </center>
-                        <center>
-                            <button onClick={this.handleTambahOrang}>Tambah Kontak Baru</button>
+                <Layout className="layout">
+
+                    <Header className="my-header">
+                        <Row>
+                            <Col span={8} className="header-columns">
+                                <Button1 onClick={this.handleTambahOrang}>Tambah Kontak</Button1>
+                            </Col>
+                            <Col span={8} className="header-columns">
+                                <h2>List data kontak</h2>
+                            </Col>
+                            <Col span={8} className="header-columns">
+                                <Input type="text" placeholder="Cari..." onKeyUp={this.handleCari} />
+                            </Col>
+                        </Row>
+                    </Header>
+
+                    {<Modal
+                        title="Tambah Data"
+                        centered='true'
+                        visible={this.state.visible}
+                        onOk={this.handleSubmit}
+                        onCancel={() => this.setState({ visible: false })}
+                        width={500}
+                    >
+                        <div style={{ textAlign: "center" }}>
+                            <p>Nama Anggota : </p>{" "}
+                            <input
+                                type="text"
+                                placeholder="Nama"
+                                onChange={this.handleNama}
+                            />
+                            <br />
                             <br></br>
-                            <p>Cari :</p>
-                            <input type="text" placeholder="Cari..." onKeyUp={this.handleCari} />
+                            <p>Nomor Telepon : </p>{" "}
+                            <input type="text" placeholder="Nomor Telp." onChange={this.handleNomor} />
+                            <br />
+                            <br></br>
+                            <p>Alamat : </p>{" "}
+                            <input
+                                type="text"
+                                placeholder="Alamat"
+                                onChange={this.handleAlamat}
+                            />
+                            <br />
+                        </div>
+                    </Modal>}
+
+
+                    <Content style={{background:"#16697a"}}>
+                        <br></br>
+                        <center>
+                        <Space direction="vertical" align='center' size='large'>
+
+                            {this.state.tekkom.map((results, index) => {
+                                console.log(index);
+                                // console.log(results);
+
+                                // console.log(results.nama);
+                                var rendered =
+                                    // --------------- INI yang bakal di render --------------------
+                                    (
+                                        // <Space direction="horizontal">  // Niatnya mau buat 2 kontak per baris vertikal, tapi ...
+                                            <div className="card" key={results.id}>
+
+                                                <Card style={{ background: "#f8f1f1", minWidth: '20vw' }}>
+                                                    <div className="card-body">
+                                                        <h5 >Nama : {results.nama}</h5>
+                                                        <h6 >
+                                                            Nomor Telepon : {results.nomor}
+                                                        </h6>
+                                                    </div>
+                                                    <button className="button" onClick={() => this.handleButton(results.nama, results.alamat, results.nomor)}>Detail</button>
+                                                    <button className="button" onClick={() => this.handleUpdate(results.id, results.nama, results.alamat, results.nomor)}>Update Kontak {results.nama}</button>
+                                                </Card>
+
+                                            </div>
+                                        // {/* </Space> */}
+                                    )
+
+                                if (results.nama.toLowerCase().includes(this.state.cari.toLowerCase())) {  // Akan mengeksekusi jika objek sesuai dgn yg dicari
+                                    // console.log("Good");
+                                    return (rendered);
+                                    // return (index);
+                                }
+
+                                return (''); // Psst HAPUS AJA hehehe
+
+                            })}
+
+                        </Space>
                         </center>
-
-                        {<Modal
-                            title="Tambah Data"
-                            centered='true'
-                            visible={this.state.visible}
-                            onOk={this.handleSubmit}
-                            onCancel={() => this.setState({ visible: false })}
-                            width={500}
-                        >
-                            <div style={{ textAlign: "center" }}>
-                                <p>Nama Anggota : </p>{" "}
-                                <input
-                                    type="text"
-                                    placeholder="Nama"
-                                    onChange={this.handleNama}
-                                />
-                                <br />
-                                <br></br>
-                                <p>Nomor Telepon : </p>{" "}
-                                <input type="text" placeholder="Nomor Telp." onChange={this.handleNomor} />
-                                <br />
-                                <br></br>
-                                <p>Alamat : </p>{" "}
-                                <input
-                                    type="text"
-                                    placeholder="Alamat"
-                                    onChange={this.handleAlamat}
-                                />
-                                <br />
-                            </div>
-                        </Modal>}
-
-
-                        {this.state.tekkom.map((results, index) => {
-                            // console.log(results);
-
-                            // console.log(results.nama);
-
-                            var rendered =
-                                // --------------- INI yang bakal di render --------------------
-                                (
-                                    <div className="card" key={results.id}>
-                                        <div className="card-body">
-                                            <h5 className="card-title">Nama : {results.nama}</h5>
-                                            <h6 className="card-subtitle mb-2 text-muted">
-                                                Nomor Telepon : {results.nomor}
-                                            </h6>
-                                        </div>
-                                        <button className="button" onClick={() => this.handleButton(results.nama, results.alamat, results.nomor)}>Detail</button>
-                                        <button className="button" onClick={() => this.handleUpdate(results.id, results.nama, results.alamat, results.nomor)}>Update Kontak {results.nama}</button>
-                                    </div>
-                                )
-
-                            if (results.nama.toLowerCase().includes(this.state.cari)) {  // Akan mengeksekusi jika objek sesuai dgn yg dicari
-                                // console.log("Good");
-                                return (rendered);
-                            }
-
-                            return (''); // Psst HAPUS AJA hehehe
-
-                        })}
-
-
-                    </div>
-                </div>
+                    </Content>
+                </Layout>
             );
         }
     }
