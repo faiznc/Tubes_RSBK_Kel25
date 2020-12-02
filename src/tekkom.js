@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import qs from 'qs';
 import { Modal, Card } from "antd";
 import { Row, Col, Space, Layout } from 'antd';
 import "antd/dist/antd.css";
@@ -11,6 +12,7 @@ const { Header, Footer, Content } = Layout;
 
 // const url = "http://36.80.179.203/api/index.php/kontak";
 const url = "http://localhost/api/index.php/kontak";
+
 
 export default class tekkom extends Component {
     constructor(props) {
@@ -101,20 +103,20 @@ export default class tekkom extends Component {
                 },
             })
                 .then((data) => {
-                    alert("berhasil menambahkan");
+                    alert("Berhasil Menambahkan Kontak");
                     window.location.reload();
                 })
                 .catch((error) => {
-                    alert("gagal lur");
+                    alert("Terjadi Masalah");
                 });
         } else {
-            alert("pastikan semua kolom terisi");
+            alert("Pastikan semua kolom terisi.");
         }
     };
 
     handleUpdate = () => {
         // console.log(id);
-        console.log("KIRIM");
+        // console.log("KIRIM");
 
         var value = {
             id: this.state.id_update,
@@ -149,15 +151,42 @@ export default class tekkom extends Component {
                 });
         }
         else {
-            alert("pastikan semua kolom terisi");
+            alert("Pastikan semua kolom terisi.");
         }
+    }
+
+    handleDelete = (this_id) => {
+        var data = qs.stringify({
+            'id': this_id
+        });
+
+        var config = {
+            method: 'delete',
+            url: 'http://localhost/api/index.php/kontak?',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            data: data
+        };
+
+        axios(config)
+            .then(function (response) {
+                if (response.status === 200) {
+                    console.log("Update Sukses");
+                    alert("Berhasil Hapus");
+                    window.location.reload();
+                }
+            })
+            .catch(function (error) {
+                alert("Terjadi Masalah");
+                console.log(error);
+            });
     }
 
     componentDidMount() {
         axios({
             method: "get",
             url: url,
-
             headers: { 'content-type': 'application/x-www-form-urlencoded' },
         })
             .then((data) => {
@@ -257,6 +286,9 @@ export default class tekkom extends Component {
                             value={this.state.alamat}
                         />
                         <br />
+                        <br></br>
+
+                        <button className="button" onClick={() => this.handleDelete(this.state.id_update)}>Hapus Kontak {this.state.nama}</button>
                     </div>
                 </Modal>}
 
@@ -300,7 +332,6 @@ export default class tekkom extends Component {
                 <Footer className='my-footer'>
                     <h2>Made by Kel 25</h2>
                 </Footer>
-
             </Layout>
         );
     }
